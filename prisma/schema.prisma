@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+
+model User {
+  id           Int               @id @default(autoincrement())
+  fullname     String
+  email        String            @unique
+  bio          String?
+  password     String
+  role         UserRole          @default(USER)
+  provider     String?
+  avatar       String?
+  providerId   String?
+  verified     DateTime?
+  createdAT    DateTime          @default(now())
+  updateAT     DateTime          @updatedAt
+
+  UserStatus   UserStatus[]
+  chats        ChatUser[]          
+  messages     Message[]
+  contactsSent     Contacts[] @relation("UserContacts")      
+  contactsReceived Contacts[] @relation("UserContactedBy")
+  
+}
+
+
+model UserStatus {
+  userId     Int      @id
+  isOnline   Boolean  @default(false)
+  lastSeen   DateTime?
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Contacts {
+   id          Int                @id @default(autoincrement())
+   createdAT   DateTime           @default(now())
+
+   accepted    Boolean            @default(false)
+   userId      Int
+   contactId   Int
+
+   user        User @relation("UserContacts", fields: [userId], references: [id])
+   contact     User @relation("UserContactedBy", fields: [contactId], references: [id])
+
+  @@unique([userId, contactId])
+}
+
+
+model Chat {
+  id          Int                @id @default(autoincrement())
+  createdAT   DateTime           @default(now())
+
+  name        String? 
+  savedChat    Boolean           @default(false)
+  users        ChatUser[]
+  messages     Message[]
+}
+
+
+
+
+model ChatUser {
+  id          Int                @id @default(autoincrement())
+
+  userId      Int
+  chatId      Int
+
+  user    User @relation(fields: [userId], references: [id])
+  chat    Chat @relation(fields: [chatId], references: [id])
+
+  @@unique([userId, chatId])
+}
+
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  text      String
+  senderId  Int
+  chatId    Int
+  createdAt DateTime @default(now())
+  replyToId   Int?     
+  replyTo     Message? @relation("ReplyToMessage", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies     Message[] @relation("ReplyToMessage")
+
+  sender    User @relation(fields: [senderId], references: [id])
+  chat      Chat @relation(fields: [chatId], references: [id])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
