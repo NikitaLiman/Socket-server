@@ -16,7 +16,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://swift-chat-fawn.vercel.app/",
+    origin: "https://swift-chat-fawn.vercel.app",
     methods: ["GET", "POST"],
   },
 });
