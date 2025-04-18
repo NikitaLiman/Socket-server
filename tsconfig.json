@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "target": "ES6",
     "module": "CommonJS",
-    "outDir": "./dist", // Убедитесь, что файлы компилируются сюда
-    "rootDir": "./src", // Убедитесь, что исходные файлы находятся в папке src
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true
   },
   "include": ["src/**/*"],
